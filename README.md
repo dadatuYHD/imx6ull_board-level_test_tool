@@ -2,7 +2,7 @@
 
 ### 系统架构图
 
-![1623247579(1)](H:\Embedded_Linux\100ask_imx6ull_pro\01_all_series_quickstart\06_实战项目\01_电子产品量产工具\doc_pic\01_程序框架_资料说明\1623247579(1).jpg)
+![程序框架](E:\PersonalProject\imx6ull_board-level_test_tool\picture\程序框架.jpg)
 
 ### 显示管理器
 
