@@ -2,7 +2,7 @@
 
 ### 系统架构图
 
-![程序框架](E:\PersonalProject\imx6ull_board-level_test_tool\picture\程序框架.jpg)
+![程序框架](./picture/程序框架.jpg)
 
 ### 显示管理器
 
