@@ -35,6 +35,7 @@ void dispDefaultDev(int x, int y, unsigned char c);
 int flushDispRegion(PDispRegion_S pDispRegion, PDispBuffer_S pDispBuffer);
 PDispBuffer_S getDispBuffer(void);
 void drawFontBitMap(PFontBitMap_S pFontBitMap, unsigned int dwColor);
-
+void drawRegion(PDispRegion_S pRegion, unsigned int dwColor);
+void drawTextInRegionCentral(char * pName, PDispRegion_S pRegion, unsigned int dwColor);
 
 #endif

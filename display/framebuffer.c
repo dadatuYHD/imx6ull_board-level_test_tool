@@ -6,7 +6,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include <linux/fb.h>
-
+#include <string.h>
 
 #include <disp_manager.h>
 #include <framebuffer.h>
@@ -4657,12 +4657,16 @@ static int fbDispDevInit(void)
         perror("mmap");
 		return -1;
 	}
+	//初始化屏幕为黑色
+	memset(g_pFbBase, 0x000000, g_screenSize);
 	
 	return 0;
 }
 
 static int fbDispDevExit(void)
 {
+    //初始化屏幕为黑色
+	memset(g_pFbBase, 0x000000, g_screenSize);
     munmap(g_pFbBase, g_screenSize);
 	close(g_fbFd);
 

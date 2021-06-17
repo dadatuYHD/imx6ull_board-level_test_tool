@@ -29,6 +29,7 @@ TARGET := test
 obj-y += input/
 obj-y += display/
 obj-y += font/
+obj-y += ui/
 obj-y += unit_test/
 
 all : start_recursive_build $(TARGET)

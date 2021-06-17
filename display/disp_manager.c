@@ -10,6 +10,63 @@ static DispBuffer_S g_dispBuffer;
 static unsigned int g_lineWidth;
 static unsigned int g_pixelWidth;
 
+void drawTextInRegionCentral(char * pName, PDispRegion_S pRegion, unsigned int dwColor)
+{
+	int n = strlen(pName);
+	int fontSize = pRegion->width / n / 2;
+	FontBitMap_S fontBitMap;
+
+	int originX, originY;
+	int i = 0;
+	int error;
+
+	if (fontSize > pRegion->height)
+		fontSize =  pRegion->height;
+
+	originX = (pRegion->width - n * fontSize)/2 + pRegion->xLeftUp;
+	originY = (pRegion->height - fontSize)/2 + fontSize + pRegion->yLeftUp;
+
+	setFontSize(fontSize);
+
+	while (pName[i])
+	{
+		/* get bitmap */
+		fontBitMap.curOriginX = originX;
+		fontBitMap.curOriginY = originY;
+		error = getFontBitMap(pName[i], &fontBitMap);
+		if (error)
+		{
+			printf("getFontBitMap error\n");
+			return;
+		}
+
+		/* draw on buffer */		
+		drawFontBitMap(&fontBitMap, dwColor);		
+
+		originX = fontBitMap.nextOriginX;
+		originY = fontBitMap.nextOriginY;	
+		i++;
+	}
+	
+}
+
+
+void drawRegion(PDispRegion_S pRegion, unsigned int dwColor)
+{
+	int x = pRegion->xLeftUp;
+	int y = pRegion->yLeftUp;
+	int width = pRegion->width;
+	int heigh = pRegion->height;
+	int i,j;
+
+	for (j = y; j < y + heigh; j++)
+	{
+		for (i = x; i < x + width; i++)
+			putPixel(i, j, dwColor);
+	}
+}
+
+
 int putPixel(int x, int y, unsigned int dwColor)
 {   
     unsigned char*  pen_8 = (unsigned char *)(g_dispBuffer.pBuffer + y * g_lineWidth + x * g_pixelWidth);
@@ -78,6 +135,8 @@ void drawFontBitMap(PFontBitMap_S pFontBitMap, unsigned int dwColor)
         }
     }    
 }
+
+
 
 void registerDispDev(PDispDev_S pDispDev)
 {
