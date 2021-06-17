@@ -2,7 +2,7 @@
 
 ### 系统架构图
 
-![1623247579(1)](H:\Embedded_Linux\100ask_imx6ull_pro\01_all_series_quickstart\06_实战项目\01_电子产品量产工具\doc_pic\01_程序框架_资料说明\1623247579(1).jpg)
+![系统框图](picture\系统框图.jpg)
 
 ### 显示管理器
 
@@ -64,3 +64,118 @@
 
 ### 字体管理器
 
+* 交叉编译**zlib-1.2.11**：
+
+  1. 下载
+
+  ` wget http://www.zlib.net/fossils/zlib-1.2.11.tar.gz `
+
+  2. 解压
+
+  `tar -zxvf  zlib-1.2.11.tar.gz `
+
+  3. 指定工具链
+
+  `export CC=arm-linux-gnueabihf-gcc` 
+
+  4. 编译
+
+  `cd /zlib-1.2.11`
+
+  ` ./configure --prefix=./tmp `
+
+  `make`
+
+  `make install`
+
+  5. 把交叉编译生成的头文件放入工具链
+
+  `cd zlib-1.2.11/tmp`
+
+  `cp include/* /home/yhd_wsl2/100ask_imx6ull-sdk/ToolChain/gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf/bin/../arm-linux-gnueabihf/libc/usr/include`
+
+  `cp -d lib/*so* /home/yhd_wsl2/100ask_imx6ull-sdk/ToolChain/gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf/bin/../arm-linux-gnueabihf/libc/usr/lib/`
+
+* **交叉编译**`libpng1.6.37`
+
+  1. 解压
+
+  `tar xJf libpng-1.6.37.tar.xz`
+
+  2. 编译
+
+  `./configure --host=arm-linux-gnueabihf --prefix=$PWD/tmp`
+
+  `make`
+
+  `make install`
+
+  3. 把交叉编译生成的头文件放入工具链
+
+  `libpng-1.6.37/tmp`
+
+  `cp include/* -rf /home/yhd_wsl2/100ask_imx6ull-sdk/ToolChain/gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf/bin/../arm-linux-gnueabihf/libc/usr/include`
+
+  `cp lib/* -rfd /home/yhd_wsl2/100ask_imx6ull-sdk/ToolChain/gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf/bin/../arm-linux-gnueabihf/libc/usr/lib/`
+
+* **交叉编译**`bzip2-1.0.6`
+
+  1. 下载
+
+  `wget https://sourceforge.net/projects/bzip2/files/bzip2-1.0.6.tar.gz`
+
+  2. 解压
+
+  `tar -zxvf bzip2-1.0.6.tar.gz`
+
+  3. 编译
+
+  `cd bzip2-1.0.6 ` 
+
+  `vim Makefile`
+
+  ![bzip2](H:\oneself_project\git_repo\imx6ull_board-level_test_tool\picture\bzip2.jpg)
+
+  `vim Makefile-libbz2_so`
+
+  ![bzip22](H:\oneself_project\git_repo\imx6ull_board-level_test_tool\picture\bzip22.jpg)
+
+`make && make install`
+
+4. 把交叉编译生成的头文件放入工具链
+
+`cd bzip2-1.0.6/tmp`
+
+`cp include/* -rf /home/yhd_wsl2/100ask_imx6ull-sdk/ToolChain/gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf/bin/../arm-linux-gnueabihf/libc/usr/include`
+
+`cp lib/* -rfd /home/yhd_wsl2/100ask_imx6ull-sdk/ToolChain/gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf/bin/../arm-linux-gnueabihf/libc/usr/lib/`
+
+`cd bzip2-1.0.6`
+
+`ln -s libbz2.so.1.0.6 libbz2.so`
+
+`cp libbz2.so* -rfd /home/yhd_wsl2/100ask_imx6ull-sdk/ToolChain/gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf/bin/../arm-linux-gnueabihf/libc/usr/lib/`
+
+* **交叉编译**`freetype-2.10.2`
+
+  1. 解压
+
+  `tar xJf freetype-2.10.2`
+
+  2. 编译
+
+  `./configure --host=arm-linux-gnueabihf --prefix=$PWD/tmp`
+
+  `make`
+
+  `make install`
+
+  3. 把交叉编译生成的头文件放入工具链
+
+  `cd freetype-2.10.2/tmp`
+
+  `cp include/* -rf /home/yhd_wsl2/100ask_imx6ull-sdk/ToolChain/gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf/bin/../arm-linux-gnueabihf/libc/usr/include`
+
+  `cp lib/* -rfd /home/yhd_wsl2/100ask_imx6ull-sdk/ToolChain/gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf/bin/../arm-linux-gnueabihf/libc/usr/lib/`
+
+* 

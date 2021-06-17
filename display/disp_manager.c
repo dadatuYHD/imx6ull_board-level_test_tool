@@ -54,6 +54,32 @@ int putPixel(int x, int y, unsigned int dwColor)
 	return 0;
 }
 
+void drawFontBitMap(PFontBitMap_S pFontBitMap, unsigned int dwColor)
+{
+    {
+    int i, j, p, q;
+	int x = pFontBitMap->region.xLeftUp;
+	int y = pFontBitMap->region.yLeftUp;
+    int x_max = x + pFontBitMap->region.width;
+    int y_max = y + pFontBitMap->region.height;
+	int bitMapWidth = pFontBitMap->region.width;
+	unsigned char * pBuffer = pFontBitMap->pBuffer;
+
+
+    for (j = y, q = 0; j < y_max; j++, q++)
+    {
+        for ( i = x, p = 0; i < x_max; i++, p++ )
+        {
+            if ( i < 0      || j < 0       ||
+                i >= g_dispBuffer.xRes || j >= g_dispBuffer.yRes )
+            continue;
+
+            if (pBuffer[q * bitMapWidth + p])
+	            putPixel(i, j, dwColor);
+        }
+    }    
+}
+
 void registerDispDev(PDispDev_S pDispDev)
 {
 	pDispDev->pNext = g_pDispDevsHead;

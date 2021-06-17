@@ -2,10 +2,7 @@
 #define __INPUT_MANAGER__
 
 #include <sys/time.h>
-
-#ifndef NULL
-#define NULL (void *)0
-#endif
+#include <common.h>
 
 #define INPUT_TYPE_SCREENTOUCH 1
 #define INPUT_TYPE_NET         2

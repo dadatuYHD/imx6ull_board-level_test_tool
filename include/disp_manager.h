@@ -1,17 +1,8 @@
 #ifndef __DISP_MANAGER_H
 #define __DISP_MANAGER_H
 
-#ifndef NULL
-#define NULL (void *)0
-#endif
-
-typedef struct DispRegion
-{
-    int xLeftUp;
-	int yLeftUp;
-	int width;
-	int height;
-}DispRegion_S, *PDispRegion_S;
+#include <common.h>
+#include <font_manager.h>
 
 typedef struct DispBuffer
 {
@@ -43,5 +34,7 @@ int initDefaultDispDev(void);
 void dispDefaultDev(int x, int y, unsigned char c);
 int flushDispRegion(PDispRegion_S pDispRegion, PDispBuffer_S pDispBuffer);
 PDispBuffer_S getDispBuffer(void);
+void drawFontBitMap(PFontBitMap_S pFontBitMap, unsigned int dwColor);
+
 
 #endif
