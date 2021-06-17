@@ -2,8 +2,7 @@
 
 ### 系统架构图
 
-![系统框图](picture\系统框图.jpg)
-
+![程序框架](./picture/程序框架.jpg)
 ### 显示管理器
 
 * **数据显示部分**在**显示管理器**的管理之下，**支持多种方式**进行数据显示，**显示管理器**可以**向主线程提供数据显示的通用API**，也可以**向底层显示设备提供通用的结构体**，以**方便底层显示设备可以注册进显示管理器**供**主线程使用**
@@ -179,3 +178,4 @@
   `cp lib/* -rfd /home/yhd_wsl2/100ask_imx6ull-sdk/ToolChain/gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf/bin/../arm-linux-gnueabihf/libc/usr/lib/`
 
 * 
+
