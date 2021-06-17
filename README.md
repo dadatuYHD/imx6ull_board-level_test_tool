@@ -177,5 +177,64 @@
 
   `cp lib/* -rfd /home/yhd_wsl2/100ask_imx6ull-sdk/ToolChain/gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf/bin/../arm-linux-gnueabihf/libc/usr/lib/`
 
-* 
+* **字体管理器**抽象出`FontLib`结构体用来描述不同的**字体管理工具**，通过该结构体可以返回**显示字符的点阵位图**
+
+```C++
+typedef struct FontLib
+{
+    char * pName;
+	int (*fontInit)(char * pFontFileName);
+	int (*setFontSize)(int fontSize);
+	int (*getFontBitMap)(unsigned int fontCode, PFontBitMap_S pFontBitMap);
+	struct FontLib *pNext;
+}FontLib_S, * PFontLib_S;
+```
+
+其中`FontBitMap`结构体用来**描述一个字符的位图**
+
+```C++
+typedef struct FontBitMap
+{
+    DispRegion_S region;
+	int curOriginX;
+	int curOriginY;
+	int nextOriginX;
+	int nextOriginY;
+	unsigned char *pBuffer;
+}FontBitMap_S, * PFontBitMap_S;
+```
+
+**字体管理器**也起着呈上启下的作用，向用户提供简单字体处理函数：
+
+```C++
+void fontsLibRegister(void);       //注册底层的字库处理工具，freetype，点阵字库等
+int selectAndInitFontLib(char * pFontLibName, char * pFontFileName); //选择并且初始化字库，打开字体文件
+int setFontSize(int fontSize);  //设置字体大小
+int getFontBitMap(unsigned int fontCode, PFontBitMap_S pFontBitMap); //获得字符的位图
+
+```
+
+向**底层字库管理工具**提供注册函数
+
+```C++
+void registerFontLib(PFontLib_S pFontLib)
+```
+
+同时在**显示管理器**中实现位图显示函数，把字符的位图信息写到**显示buffer**中
+
+```C++
+void drawFontBitMap(PFontBitMap_S pFontBitMap, unsigned int dwColor)
+```
+
+最后通过显示管理器提供的函数`flushDispRegion`把数据刷到显存中
+
+```C++
+int flushDispRegion(PDispRegion_S pDispRegion, PDispBuffer_S pDispBuffer)
+```
+
+
+
+
+
+
 
