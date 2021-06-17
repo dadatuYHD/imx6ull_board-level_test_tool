@@ -81,7 +81,7 @@ static int freetypeGetFontBitMap(unsigned int fontCode, PFontBitMap_S pFontBitMa
 }
 
 static FontLib_S g_fontLib = {
-    .name          = "freetype",
+    .pName          = "freetype",
 	.fontInit      = freetypeFontInit,
 	.setFontSize   = freetypeSetFontSize,
 	.getFontBitMap = freetypeGetFontBitMap, 

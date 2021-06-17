@@ -56,7 +56,6 @@ int putPixel(int x, int y, unsigned int dwColor)
 
 void drawFontBitMap(PFontBitMap_S pFontBitMap, unsigned int dwColor)
 {
-    {
     int i, j, p, q;
 	int x = pFontBitMap->region.xLeftUp;
 	int y = pFontBitMap->region.yLeftUp;

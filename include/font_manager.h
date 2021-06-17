@@ -11,7 +11,7 @@ typedef struct FontBitMap
 	int nextOriginX;
 	int nextOriginY;
 	unsigned char *pBuffer;
-}FontBitMap_S, PFontBitMap_S;
+}FontBitMap_S, * PFontBitMap_S;
 
 
 typedef struct FontLib
@@ -21,7 +21,7 @@ typedef struct FontLib
 	int (*setFontSize)(int fontSize);
 	int (*getFontBitMap)(unsigned int fontCode, PFontBitMap_S pFontBitMap);
 	struct FontLib *pNext;
-}FontLib_S, PFontLib_S;
+}FontLib_S, * PFontLib_S;
 
 //provide with model of font_manager.c to font lib
 void registerFontLib(PFontLib_S pFontLib);
