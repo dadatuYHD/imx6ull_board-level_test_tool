@@ -5,6 +5,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define X_GAP 5
 #define Y_GAP 5
@@ -18,6 +19,10 @@ static int mainPagePressedButton(PUiButton_S pButton, PDispBuffer_S pDispBuffer,
 	char name[100];
 	char status[100];
 	char * pButtonName;
+	char * pCommandStatus[3] = {"err", "ok", "percent"};
+	int commandStatusIndex = -1;
+	char command[1000];
+	PItemCfg_S pItemCfg;
 
 	pButtonName = pButton->pName;
 	
@@ -31,7 +36,10 @@ static int mainPagePressedButton(PUiButton_S pButton, PDispBuffer_S pDispBuffer,
 		/* 1.2 修改颜色 */
 		pButton->status = !pButton->status;
 		if (pButton->status)
-			dwColor = BUTTON_PRESSED_COLOR;
+		{
+            dwColor = BUTTON_PRESSED_COLOR;
+		    commandStatusIndex = 1;
+		}
 	}
 	else if (pInputEvent->type == INPUT_TYPE_NET)
 	{
@@ -40,13 +48,21 @@ static int mainPagePressedButton(PUiButton_S pButton, PDispBuffer_S pDispBuffer,
 		/* 根据传入的字符串修改颜色 : wifi ok, wifi err, burn 70 */
 		sscanf(pInputEvent->str, "%s %s", name, status);
 		if (strcmp(status, "ok") == 0)
-			dwColor = BUTTON_PRESSED_COLOR;
+		{
+            dwColor = BUTTON_PRESSED_COLOR;
+			commandStatusIndex = 1;
+		}	
 		else if (strcmp(status, "err") == 0)
-			dwColor = BUTTON_DEFAULT_COLOR;
+		{
+            dwColor = BUTTON_DEFAULT_COLOR;
+			commandStatusIndex = 0;
+		}
+			
 		else if (status[0] >= '0' && status[0] <= '9')
 		{			
 			dwColor = BUTTON_PERCENT_COLOR;
-			pButtonName = status;			
+			pButtonName = status;
+			commandStatusIndex = 2;
 		}
 		else
 			return -1;
@@ -64,8 +80,55 @@ static int mainPagePressedButton(PUiButton_S pButton, PDispBuffer_S pDispBuffer,
 
 	/* flush to lcd/web */
 	flushDispRegion(&pButton->region, pDispBuffer);
+
+	/* 执行command */
+	pItemCfg = getItemCfgByName(pButton->pName);
+	if (pItemCfg->command[0] != '\0')
+	{
+		sprintf(command, "%s %s", pItemCfg->command, pCommandStatus[commandStatusIndex]);
+		//system(command); //容易卡死
+	}
 	
 	return 0;
+}
+
+static int getFontSizeForAllButton(void)
+{
+	int i;
+	int max_len = -1;
+	int max_index = 0;
+	int len;
+	DispRegionCartesian_S regionCar;
+	float k, kx, ky;
+	
+	/* 1. 找出name最长的Button */
+	for (i = 0; i < g_buttonCnt; i++)
+	{
+		len = strlen(g_buttons[i].pName);
+		if (len > max_len)
+		{
+			max_len = len;
+			max_index = i;
+		}
+	}
+
+	/* 2. 以font_size =100, 算出它的外框 */
+	setFontSize(100);
+	getStrBoxRegionCar(g_buttons[max_index].pName, &regionCar);
+
+	/* 3. 把文字的外框缩放为Button的外框 */
+	kx = (float)g_buttons[max_index].region.width / regionCar.width;
+	ky = (float)g_buttons[max_index].region.height / regionCar.height;
+	//printf("button width / str width   = %d/%d = %f\n", g_tButtons[max_index].tRegion.iWidth, tRegionCar.iWidth, kx);
+	//printf("button height / str height = %d/%d = %f\n", g_tButtons[max_index].tRegion.iHeigh, tRegionCar.iHeigh, ky);
+	if (kx < ky)
+		k = kx;
+	else
+		k = ky;
+
+	//printf("font size = %d\n", (int)(k*100));
+	/* 4. 反算出font size, 只取0.80, 避免文字过于接近边界 */
+	return k * 100 * 0.8;
 }
 
 static void generateButtonsUi(void)
@@ -81,6 +144,7 @@ static void generateButtonsUi(void)
 	int pre_start_x, pre_start_y;
 	PUiButton_S pButton;
 	int index = 0;
+	int fontSize = 0;
 	
 	/* 算出单个按钮的width/height */
 	g_buttonCnt = n = getItemCfgCount();
@@ -121,9 +185,14 @@ static void generateButtonsUi(void)
 		}
 	}
 
+	fontSize = getFontSizeForAllButton();
+
 	/* OnDraw */
 	for (index = 0; index < n; index++)
+	{
+        g_buttons[index].fontSize = fontSize;
 		g_buttons[index].pDrawButton(&g_buttons[index], pDispBuffer);
+	}
 }
 
 static int isTouchPointInRegion(int x, int y, PDispRegion_S pRegion)
@@ -198,7 +267,7 @@ static void mainPageRun(void * pParams)
 	{
 		/* 读取输入事件 */
 		error = userGetInputEventData(&inputEvent);
-		if (error || inputEvent.pressure == 0)
+		if (error || (inputEvent.pressure == 0 && inputEvent.type == 1) )
 			continue;
 
 		/* 根据输入事件找到按钮 */

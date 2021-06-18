@@ -45,10 +45,8 @@ int getFontBitMap(unsigned int fontCode, PFontBitMap_S pFontBitMap)
 	return g_pDefaultFontLib->getFontBitMap(fontCode, pFontBitMap);
 }
 
-
-
-
-
-
-
+int getStrBoxRegionCar(char *pStr, PDispRegionCartesian_S pDispRegionCartesian)
+{
+    return g_pDefaultFontLib->getStrBoxRegionCar(pStr, pDispRegionCartesian);
+}
 

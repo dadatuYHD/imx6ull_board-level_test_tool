@@ -12,21 +12,19 @@ static unsigned int g_pixelWidth;
 
 void drawTextInRegionCentral(char * pName, PDispRegion_S pRegion, unsigned int dwColor)
 {
-	int n = strlen(pName);
-	int fontSize = pRegion->width / n / 2;
 	FontBitMap_S fontBitMap;
+	DispRegionCartesian_S dispRegionCartesian;
 
 	int originX, originY;
 	int i = 0;
 	int error;
 
-	if (fontSize > pRegion->height)
-		fontSize =  pRegion->height;
+	/* 计算字符串的外框 */
+    getStrBoxRegionCar(pName, &dispRegionCartesian);
 
-	originX = (pRegion->width - n * fontSize)/2 + pRegion->xLeftUp;
-	originY = (pRegion->height - fontSize)/2 + fontSize + pRegion->yLeftUp;
-
-	setFontSize(fontSize);
+    /* 算出第一个字符的origin */
+	originX = pRegion->xLeftUp + (pRegion->width  - dispRegionCartesian.width)/2  - dispRegionCartesian.xLeftUp;
+	originY = pRegion->yLeftUp + (pRegion->height - dispRegionCartesian.height)/2 + dispRegionCartesian.yLeftUp;
 
 	while (pName[i])
 	{

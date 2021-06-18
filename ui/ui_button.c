@@ -6,6 +6,7 @@ static int defaultDrawButton(struct UiButton * pButton, PDispBuffer_S pDispBuffe
 	drawRegion(&pButton->region, BUTTON_DEFAULT_COLOR);
 
 	/* 居中写文字 */
+	setFontSize(pButton->fontSize);
 	drawTextInRegionCentral(pButton->pName, &pButton->region, BUTTON_TEXT_COLOR);
 
 	/* flush to lcd/web */

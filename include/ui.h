@@ -20,6 +20,7 @@ typedef struct UiButton
 {
     char * pName;
 	int status;
+	int fontSize;
 	DispRegion_S region;
 	PDrawButtonFunc pDrawButton;
 	PPressedButtonFunc pPressedButton;

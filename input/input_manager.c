@@ -81,6 +81,8 @@ static void * inputEventThreadFunc(void *data)
 	while (1)
 	{
         ret = pInputDevice->getInputEvent(&inputEvent);
+		//printf("inputEvent.type = %d\n", inputEvent.type);
+		//printf("inputEvent.str = %s\n", inputEvent.str);
 
 		if (!ret)
 		{
@@ -142,7 +144,7 @@ int userGetInputEventData(PInputEvent_S pInputEvent)
         pthread_cond_wait(&g_condVar, &g_mutex);
 		ret = getInputEventFromBuffer(&inputEvent);
 		if (!ret)
-		{
+		{	
             *pInputEvent = inputEvent;
 		}
 		pthread_mutex_unlock(&g_mutex);	

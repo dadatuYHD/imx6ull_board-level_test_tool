@@ -20,6 +20,7 @@ typedef struct FontLib
 	int (*fontInit)(char * pFontFileName);
 	int (*setFontSize)(int fontSize);
 	int (*getFontBitMap)(unsigned int fontCode, PFontBitMap_S pFontBitMap);
+	int (*getStrBoxRegionCar)(char * pStr, PDispRegionCartesian_S pDispRegionCartesian);
 	struct FontLib *pNext;
 }FontLib_S, * PFontLib_S;
 
@@ -31,6 +32,7 @@ void fontsLibRegister(void);
 int selectAndInitFontLib(char * pFontLibName, char * pFontFileName);
 int setFontSize(int fontSize);
 int getFontBitMap(unsigned int fontCode, PFontBitMap_S pFontBitMap);
+int getStrBoxRegionCar(char *pStr, PDispRegionCartesian_S pDispRegionCartesian);
 
 
 
