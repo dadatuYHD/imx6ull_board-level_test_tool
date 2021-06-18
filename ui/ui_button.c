@@ -38,7 +38,10 @@ void initButton(PUiButton_S pButton, char * pName, PDispRegion_S pRegion,  PDraw
 {
 	pButton->status = 0;
 	pButton->pName = pName;
-	pButton->region = *pRegion;
+	if (pRegion)
+	{
+        pButton->region = *pRegion;    
+	}
 	pButton->pDrawButton = pDrawButton ? pDrawButton : defaultDrawButton;
 	pButton->pPressedButton = pPressedButton ? pPressedButton : defaultPressedButton;
 }
