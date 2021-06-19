@@ -5,9 +5,12 @@
 ![程序框架](./picture/程序框架.jpg)
 ### 显示管理器
 
-* **数据显示部分**在**显示管理器**的管理之下，**支持多种方式**进行数据显示，**显示管理器**可以**向主线程提供数据显示的通用API**，也可以**向底层显示设备提供通用的结构体**，以**方便底层显示设备可以注册进显示管理器**供**主线程使用**
+* 包含：**disp_manager.c/h、framebuffer.c/h**模块
 
-* **显示管理器**向主线程提供的通用**API**如下：
+  1. **disp_manager.c/h**：显示管理器
+  2. **framebuffer.c/h**：底层显示模块
+
+* **disp_manager.c/h**：数据显示部分**在**显示管理器**的管理之下，**支持多种方式**进行数据显示，**显示管理器**可以**向主线程提供数据显示的通用API**，也可以**向底层显示设备提供通用的结构体**，以**方便底层显示设备可以注册进显示管理器**供**主线程使用**，**显示管理器**向主线程提供的通用**API如下：
 
   ```C++
   void dispDevRegister(void); //注册显示设备
@@ -18,9 +21,36 @@
   PDispBuffer_S getDispBuffer(void); //获取buffer
   ```
 
-* 显示管理器用`DispDev`结构体描述底层显示设备，用`DispBuffer`结构体描述显示`buffer`，用结构体`DispRegion`描述`buffer`刷新到硬件显示内存的哪个区域，只有当显示`buffer`刷新到硬件显存之后，数据才会真正的显示；底层显示设备使用显示管理器提供的`int putPixel(int x, int y, unsigned int dwColor)`函数构造自己的数据显示函数，从而在提供给显示管理器，底层显示设备使用`void registerDispDev(PDispDev_S pDispDev)`函数把自己的`DispDev`结构体注册进显示管理器，显示管理器通过链表的形式把所有显示设备连接起来，需要使用的时候就在链表中查询
+  显示管理器用`DispDev`结构体描述底层显示设备，用`DispBuffer`结构体描述显示`buffer`，用结构体`DispRegion`描述`buffer`刷新到硬件显示内存的哪个区域，只有当显示`buffer`刷新到硬件显存之后，数据才会真正的显示；底层显示设备使用显示管理器提供的`int putPixel(int x, int y, unsigned int dwColor)`函数构造自己的数据显示函数，从而在提供给显示管理器，底层显示设备使用`void registerDispDev(PDispDev_S pDispDev)`函数把自己的`DispDev`结构体注册进显示管理器，显示管理器通过链表的形式把所有显示设备连接起来，需要使用的时候就在链表中查询
+
+  ```C++
+  typedef struct DispBuffer
+  {
+      int xRes;
+  	int yRes;
+  	int bpp;
+  	char* pBuffer;
+  }DispBuffer_S, *PDispBuffer_S;
+  
+  typedef struct DispDev
+  {
+      char* pName;
+  	int   (*dispDevInit)(void); 
+  	int   (*dispDevExit)(void); 
+  	int   (*getDispBuffer)(PDispBuffer_S pDispBuffer);
+  	void  (*dispDev)(int x, int y, unsigned char c);
+  	int   (*flushDispRegion)(PDispRegion_S pDispRegion, PDispBuffer_S pDispBuffer);
+  	struct DispDev* pNext;
+  }DispDev_S, *PDispDev_S;
+  ```
 
 ### 输入管理器
+
+* 包含：**input_manager.c/h、netinput.c/h、touchscreen.c/h**模块
+
+  1. **input_manager.c/h**：输入管理器
+  2. **netinput.c/h**：网络输入模块
+  3. **touchscreen.c/h**：**LCD**输入模块
 
 * **数据输入部分**在**输入管理器**的管理之下，支持多种方式输入数据，输入管理器主要**向主线程提供通用的API函数**，屏蔽掉底层硬件复杂的操作逻辑，同时对底层硬件进行抽象管理，用链表连接每个硬件设备，对于需要使用的硬件设备，只需要**注册进输入管理器**即可
 
@@ -60,6 +90,13 @@
   ```
 
   **底层硬件输入设备**通过输入管理器提供的函数`registerInputDev`把自己**注册进输入管理器**
+  
+* **touchscreen.c/h**：通过**tslib**库实现数据的读取，然后放进**InputEvent**，而**netinput.c/h**通过UDP协议获取数据，然后放进**InputEvent**结构体
+
+* 数据读取的过程：
+
+  1. **initInputDevice**函数会为**每个底层输入设备**创建一个**数据读取线程**，当有数据输入的时候，线程会把数据读取回来，然后放入环形buffer，然后通过**pthread_cond_signal**唤醒**userGetInputEventData**函数从环形**buf**读取数据
+  2. 当环形buf没有数据的时候，**userGetInputEventData**会阻塞在**pthread_cond_wait**函数处
 
 ### 字体管理器
 
@@ -177,6 +214,11 @@
 
   `cp lib/* -rfd /home/yhd_wsl2/100ask_imx6ull-sdk/ToolChain/gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf/bin/../arm-linux-gnueabihf/libc/usr/lib/`
 
+* 包含：**font_manager.c/h、framebuffer.c/h**等模块
+
+  1. **font_manager.c/h**：字体管理器
+  2. **freetype.c/h**：底层字体处理引擎
+
 * **字体管理器**抽象出`FontLib`结构体用来描述不同的**字体管理工具**，通过该结构体可以返回**显示字符的点阵位图**
 
 ```C++
@@ -234,7 +276,8 @@ int flushDispRegion(PDispRegion_S pDispRegion, PDispBuffer_S pDispBuffer)
 
 ### UI系统
 
-* 通过抽象一个`UiButton`结构体来描述一个LCD显示器上的虚拟按钮
+* 包含：**ui.h、ui.button.c**
+* 通过抽象一个`UiButton`结构体来描述一个**LCD**显示器上的虚拟按钮
 
 ```C++
 typedef struct UiButton
@@ -277,3 +320,48 @@ typedef struct UiButton
 ### 业务系统
 
 * 初始化显示系统、输入系统、字体系统、页面系统，调用主页面，在主页面中读取配置文件，根据配置文件生成按钮界面，然后等待事件缓冲去有数据便可以读取事件，根据事件找到对应的输入设备(按钮、网络输入)，然后执行相应的响应函数
+
+
+
+------------------------
+
+### 输出调试管理器
+
+* 包含**degug_manager.c/h、netprint.c、stdout.c**模块
+
+  1. **degug_manager.c/h**：调试管理器
+  2. **netprint.c**：底层网络调试模块
+  3. **stdout.c**：标准输出调试模块
+
+* **调试管理器**通过抽象**DebugOpr**结构体来描述底层调试模块
+
+  ```C++
+  typedef struct DebugOpr {
+  	char *name;                //调试模块名字
+  	int isCanUse;              //模块使能
+  	int (*DebugInit)(void);   /* 调试模块的初始化函数 */
+  	int (*DebugExit)(void);   /* 退出函数 */
+  	int (*DebugPrint)(char *strData);  /* 输出函数 */
+  	struct DebugOpr *ptNext;  //调试管理器通过链表管理底层调试模块
+  }T_DebugOpr, *PT_DebugOpr;
+  ```
+
+  1. 页面管理器向底层调试模块提供**RegisterDebugOpr**函数，底层模块可以通过该函数把具体填充的**DebugOpr**结构体注册到调试管理器中
+
+  2. 页面管理器向用户提供以下API
+
+     ```C++
+     void ShowDebugOpr(void);//打印系统支持调试模块
+     PT_DebugOpr GetDebugOpr(char *pcName);//获得调试模块的结构体
+     int SetDbgLevel(char *strBuf);//设置调试信息打印等级
+     int SetDbgChanel(char *strBuf);//选择打印模块
+     int DebugInit(void);//注册调试管理器中的调试模块
+     int DebugPrint(const char *pcFormat, ...);//通过调试模块输出调试信息
+     int InitDebugChanel(void); //调用底层调试模块的初始化函数
+     ```
+
+  3. 调试信息只有超过**g_iDbgLevelLimit**这个级别，才能被输出
+
+* **底层调试模块**的具体实现原理：
+  1. **stdout.c**标准输出调试模块通过**printf**函数实现
+  2. **netprint.c**底层网络调试模块基于UDP协议实现，该模块会初始化为一个UDP服务器，并且创建发送线程、接受线程、环形缓冲区。接受线程可以接受客户端的命令，实现设置打印级别，使能/失能打印模块。当上层进行数据打印的时候，**netprint.c**中的打印函数会把数据存入环形缓冲区，并且唤醒发送线程，发送线程从环形缓冲区取出数据然后便可以发送给客户端进行显示
