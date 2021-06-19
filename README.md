@@ -232,9 +232,48 @@ void drawFontBitMap(PFontBitMap_S pFontBitMap, unsigned int dwColor)
 int flushDispRegion(PDispRegion_S pDispRegion, PDispBuffer_S pDispBuffer)
 ```
 
+### UI系统
 
+* 通过抽象一个`UiButton`结构体来描述一个LCD显示器上的虚拟按钮
 
+```C++
+typedef struct UiButton
+{
+    char * pName;                             //按钮名字
+	int status;                               //按钮状态
+	int fontSize;                             //按钮名字的字体
+	DispRegion_S region;                      //按钮的显示区域
+	PDrawButtonFunc pDrawButton;              //绘制按钮的函数
+	PPressedButtonFunc pPressedButton;        //按钮按下调用的函数
+}UiButton_S, *PUiButton_S;
+```
 
+用户通过调用`initButton`函数初始化一个按钮，其中`pDrawButton`和`pPressedButton`可以由用户提供，也可以使用默认的函数
 
+### 页面管理器
 
+* 包含**page_manager.c/h、mainpage.c/h**模块
+  1. **page_manager.c/h**：页面管理器
+  2. **mainpage.c/h**：底层页面模块
 
+* 页面管理器通过抽象结构体**PageAction**来描述一个底层的页面模块
+
+  ```C++
+  typedef struct PageAction
+  {
+      char * pName;                    //底层页面的名字
+  	void (*run)(void * pParams);     //底层页面对应的响应函数
+  	struct PageAction * pNext;       //所有页面通过链表进行存储      
+  }PageAction_S, * PPageAction_S;
+  ```
+
+  页面管理器向底层页面模块，比如**mainpage.c/h**，提供注册函数**pageRegister**，底层页面便可以把实现的**PageAction**结构体注册到页面管理器中，页面管理器可以向用户提供简单页面处理接口：
+
+  ```C++
+  PPageAction_S selectPage(char * pName); //选择需要使用的底层页面
+  void pageSystemRegister(void);//注册所有底层页面
+  ```
+
+### 业务系统
+
+* 初始化显示系统、输入系统、字体系统、页面系统，调用主页面，在主页面中读取配置文件，根据配置文件生成按钮界面，然后等待事件缓冲去有数据便可以读取事件，根据事件找到对应的输入设备(按钮、网络输入)，然后执行相应的响应函数
