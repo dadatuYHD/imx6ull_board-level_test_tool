@@ -25,10 +25,10 @@ typedef struct FontLib
 }FontLib_S, * PFontLib_S;
 
 //provide with model of font_manager.c to font lib
-void registerFontLib(PFontLib_S pFontLib);
+void fontlibRegister(PFontLib_S pFontLib);
 
 //provide with model of font_manager.c to font_test.c/user
-void fontsLibRegister(void);
+void fontsLibSystemRegister(void);
 int selectAndInitFontLib(char * pFontLibName, char * pFontFileName);
 int setFontSize(int fontSize);
 int getFontBitMap(unsigned int fontCode, PFontBitMap_S pFontBitMap);

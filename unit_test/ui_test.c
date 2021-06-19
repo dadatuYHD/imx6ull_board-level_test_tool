@@ -30,11 +30,11 @@ int main(int argc, char **argv)
 
 	selectDefaultDispDev("fb");
 
-	initDefaultDispDev();
+	defaultDispDevInit();
 
 	pBuffer = getDispBuffer();
 
-	fontsLibRegister();
+	fontsLibSystemRegister();
 	
 	error = selectAndInitFontLib("freetype", argv[1]);
 	if (error)

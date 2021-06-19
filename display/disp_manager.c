@@ -136,13 +136,13 @@ void drawFontBitMap(PFontBitMap_S pFontBitMap, unsigned int dwColor)
 
 
 
-void registerDispDev(PDispDev_S pDispDev)
+void dispDevRegister(PDispDev_S pDispDev)
 {
 	pDispDev->pNext = g_pDispDevsHead;
 	g_pDispDevsHead = pDispDev;
 }
 
-void dispDevRegister(void)
+void dispSystemRegister(void)
 {
     fbDevRegister();    
 }
@@ -167,7 +167,7 @@ int selectDefaultDispDev(char* pName)
 	return ret;
 }
 
-int initDefaultDispDev(void)
+int defaultDispDevInit(void)
 {
     int ret = -1;
 

@@ -4632,7 +4632,7 @@ static const unsigned char fontdata_8x16[FONTDATAMAX] = {
 
 };
 
-static int fbDispDevInit(void)
+static int fb_dispDevInit(void)
 {
 	g_fbFd = open("/dev/fb0", O_RDWR);
 	if (g_fbFd == -1)
@@ -4663,7 +4663,7 @@ static int fbDispDevInit(void)
 	return 0;
 }
 
-static int fbDispDevExit(void)
+static int fb_dispDevExit(void)
 {
     //初始化屏幕为黑色
 	memset(g_pFbBase, 0x000000, g_screenSize);
@@ -4673,7 +4673,7 @@ static int fbDispDevExit(void)
 	return 0;
 }
 
-static int fbGetDispBuffer(PDispBuffer_S pDispBuffer)
+static int fb_getDispBuffer(PDispBuffer_S pDispBuffer)
 {
     pDispBuffer->xRes = g_fbVarInfo.xres;
 	pDispBuffer->yRes = g_fbVarInfo.yres;
@@ -4683,7 +4683,7 @@ static int fbGetDispBuffer(PDispBuffer_S pDispBuffer)
 	return 0;
 }
 
-static void fbDispDev(int x, int y, unsigned char c)
+static void fb_dispDev(int x, int y, unsigned char c)
 {
     unsigned char* pDots = (unsigned char *)&fontdata_8x16[c*16];
 
@@ -4706,23 +4706,23 @@ static void fbDispDev(int x, int y, unsigned char c)
 	}
 }
 
-static int fbFlushDispRegion(PDispRegion_S pDispRegion, PDispBuffer_S pDispBuffer)
+static int fb_flushDispRegion(PDispRegion_S pDispRegion, PDispBuffer_S pDispBuffer)
 {
     return 0;
 }
 
 static DispDev_S g_frameBufferDev = {
     .pName           = "fb",
-	.dispDevInit     = fbDispDevInit,
-	.dispDevExit     = fbDispDevExit,
-	.getDispBuffer   = fbGetDispBuffer,
-	.dispDev         = fbDispDev,
-	.flushDispRegion = fbFlushDispRegion, 
+	.dispDevInit     = fb_dispDevInit,
+	.dispDevExit     = fb_dispDevExit,
+	.getDispBuffer   = fb_getDispBuffer,
+	.dispDev         = fb_dispDev,
+	.flushDispRegion = fb_flushDispRegion, 
 };
 
 void fbDevRegister(void)
 {
-    registerDispDev(&g_frameBufferDev);
+    dispDevRegister(&g_frameBufferDev);
 }
 
 

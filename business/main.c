@@ -26,16 +26,16 @@ int main(int argc, char **argv)
 	}
 	
 	/* 初始化显示系统 */		
-	dispDevRegister();
+	dispSystemRegister();
 	selectDefaultDispDev("fb");
-	initDefaultDispDev();
+	defaultDispDevInit();
 
 	/* 初始化输入系统 */		
-    inputDevRegister();
-	initInputDevice();
+    inputSystemRegister();
+	inputDeviceInit();
 
 	/* 初始化文字系统 */		
-	fontsLibRegister();
+	fontsLibSystemRegister();
 	error = selectAndInitFontLib("freetype", argv[1]);
 	if (error)
 	{
@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 	}
 
 	/* 初始化页面系统 */		
-	registerPages();
+	pageSystemRegister();
 
 	/* 运行业务系统的主页面 */
 	selectPage("main_page")->run(NULL);

@@ -35,15 +35,15 @@ int main(int argc, char **argv)
 	
 	font_size  = strtol(argv[4], NULL, 0);
 		
-    dispDevRegister();
+    dispSystemRegister();
 
 	selectDefaultDispDev("fb");
 
-	initDefaultDispDev();
+	defaultDispDevInit();
 
 	pBuffer = getDispBuffer();
 
-	fontsLibRegister();
+	fontsLibSystemRegister();
 	
 	error = selectAndInitFontLib("freetype", argv[1]);
 	if (error)

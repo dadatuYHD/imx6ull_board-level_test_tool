@@ -13,5 +13,5 @@ void pageRegister(PPageAction_S pPageAction);
 
 //provide with model of page_manager.c to user/page_test.c
 PPageAction_S selectPage(char * pName);
-void registerPages(void);
+void pageSystemRegister(void);
 #endif

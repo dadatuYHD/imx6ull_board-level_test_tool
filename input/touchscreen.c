@@ -6,7 +6,7 @@
 
 static struct tsdev* g_pTsDev = NULL;
 
-static int touchscreenDevInit(void)
+static int touchscreen_devInit(void)
 {
 	g_pTsDev = ts_setup(NULL, 0);
 	if (!g_pTsDev)
@@ -18,14 +18,14 @@ static int touchscreenDevInit(void)
 	return 0;
 }
 
-static int touchscreenDevExit(void)
+static int touchscreen_devExit(void)
 {
     ts_close(g_pTsDev);
 	
 	return 0;
 }
 
-int touchscreenGetInputEvent(PInputEvent_S pInputEvent)
+int touchscreen_getInputEvent(PInputEvent_S pInputEvent)
 {
     struct ts_sample samp;
 	int ret;
@@ -49,13 +49,13 @@ int touchscreenGetInputEvent(PInputEvent_S pInputEvent)
 
 static InputDevice_S g_touchscreenDevice = {
     .name          = "touchscreen",
-	.inputDevInit  = touchscreenDevInit, 
-	.inputDevExit  = touchscreenDevExit,
-	.getInputEvent = touchscreenGetInputEvent, 
+	.inputDevInit  = touchscreen_devInit, 
+	.inputDevExit  = touchscreen_devExit,
+	.getInputEvent = touchscreen_getInputEvent, 
 };
 
 void touchscreenDevRegister(void)
 {
-    registerInputDev(&g_touchscreenDevice);    
+    inputDevRegister(&g_touchscreenDevice);    
 }
 

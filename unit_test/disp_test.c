@@ -2,11 +2,11 @@
 
 int main(int argc, char* argv[])
 {
-    dispDevRegister();
+    dispSystemRegister();
 
 	selectDefaultDispDev("fb");
 
-	initDefaultDispDev();
+	defaultDispDevInit();
 
 	dispDefaultDev(500, 500, 'B');
 

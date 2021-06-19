@@ -12,7 +12,7 @@ void pageRegister(PPageAction_S pPageAction)
     g_pageActionHead = pPageAction;   
 }
 
-void registerPages(void)
+void pageSystemRegister(void)
 {
     mainPageRegister();
 }

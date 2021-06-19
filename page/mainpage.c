@@ -245,7 +245,7 @@ static PUiButton_S getButtonByInputEvent(PInputEvent_S pInputEvent)
 	return NULL;
 }
 
-static void mainPageRun(void * pParams)
+static void mainPage_run(void * pParams)
 {
     int error = 0;
 	InputEvent_S inputEvent;
@@ -282,7 +282,7 @@ static void mainPageRun(void * pParams)
 
 static PageAction_S g_pageAction = {
     .pName = "main_page",
-	.run   = mainPageRun, 
+	.run   = mainPage_run, 
 };
 
 void mainPageRegister(void)

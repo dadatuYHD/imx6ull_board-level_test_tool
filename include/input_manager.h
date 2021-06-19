@@ -27,11 +27,11 @@ typedef struct InputDevice
 }InputDevice_S, * PInputDevice_S;
 
 //provide with model of input_manager.c to input device
-void registerInputDev(PInputDevice_S ptInputDev);
+void inputDevRegister(PInputDevice_S ptInputDev);
 
 //provide with model of input_manager.c to input_test.c/user
-void inputDevRegister(void);
-int  initInputDevice(void);
+void inputSystemRegister(void);
+int  inputDeviceInit(void);
 int userGetInputEventData(PInputEvent_S pInputEvent);
 
 #endif

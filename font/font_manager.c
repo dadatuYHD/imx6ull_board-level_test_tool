@@ -6,13 +6,13 @@
 static PFontLib_S g_pFontLibHead = NULL;
 static PFontLib_S g_pDefaultFontLib = NULL;
 
-void registerFontLib(PFontLib_S pFontLib)
+void fontlibRegister(PFontLib_S pFontLib)
 {
     pFontLib->pNext = g_pFontLibHead;
 	g_pFontLibHead = pFontLib;
 }
 
-void fontsLibRegister(void)
+void fontsLibSystemRegister(void)
 {
 	freetypeFontLibRegister();
 }

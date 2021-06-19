@@ -15,7 +15,7 @@
 
 static int g_socketFd = 0;
 
-static int netInputDevInit(void)
+static int net_inputDevInit(void)
 {
     int ret = -1;
 	struct sockaddr_in serverAddr;
@@ -41,14 +41,14 @@ static int netInputDevInit(void)
 	return ret;
 }
 
-static int netInputDevExit(void)
+static int net_inputDevExit(void)
 {
     close(g_socketFd);
 
 	return 0;
 }
 
-static int netInputGetInputEvent(PInputEvent_S pInputEvent)
+static int net_inputGetInputEvent(PInputEvent_S pInputEvent)
 {
 	struct sockaddr_in sockClientAddr;
 	int recvLen = 0;
@@ -79,13 +79,13 @@ static int netInputGetInputEvent(PInputEvent_S pInputEvent)
 
 static InputDevice_S g_netInputDevice = {
     .name          = "net",
-	.inputDevInit  = netInputDevInit, 
-	.inputDevExit  = netInputDevExit,
-	.getInputEvent = netInputGetInputEvent, 
+	.inputDevInit  = net_inputDevInit, 
+	.inputDevExit  = net_inputDevExit,
+	.getInputEvent = net_inputGetInputEvent, 
 };
 
 void netInputDevRegister(void)
 {
-    registerInputDev(&g_netInputDevice);    
+    inputDevRegister(&g_netInputDevice);    
 }
 

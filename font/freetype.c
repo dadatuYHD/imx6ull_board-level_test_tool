@@ -161,6 +161,6 @@ static FontLib_S g_fontLib = {
 
 void freetypeFontLibRegister(void)
 {
-	registerFontLib(&g_fontLib);
+	fontlibRegister(&g_fontLib);
 }
 

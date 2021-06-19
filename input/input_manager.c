@@ -57,13 +57,13 @@ static int getInputEventFromBuffer(PInputEvent_S pInputEvent)
 /* end of 实现环形buffer */
 
 
-void registerInputDev(PInputDevice_S ptInputDev)
+void inputDevRegister(PInputDevice_S ptInputDev)
 {
     ptInputDev->pNext = g_pInputDevHead;
 	g_pInputDevHead = ptInputDev;
 }
 
-void inputDevRegister(void)
+void inputSystemRegister(void)
 {
     touchscreenDevRegister();
 
@@ -99,7 +99,7 @@ static void * inputEventThreadFunc(void *data)
 }
 
 
-int initInputDevice(void)
+int inputDeviceInit(void)
 {
     PInputDevice_S pTmp = g_pInputDevHead;
     pthread_t thread;
