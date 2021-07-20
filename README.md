@@ -13,16 +13,21 @@
 * **disp_manager.c/h**：数据显示部分**在**显示管理器**的管理之下，**支持多种方式**进行数据显示，**显示管理器**可以**向主线程提供数据显示的通用API**，也可以**向底层显示设备提供通用的结构体**，以**方便底层显示设备可以注册进显示管理器**供**主线程使用**，**显示管理器**向主线程提供的通用**API如下：
 
   ```C++
-  void dispDevRegister(void); //注册显示设备
-  int selectDefaultDispDev(char* pName); //选择一个已经注册的显示设备
-  int initDefaultDispDev(void); //初始化选择的显示设备
-  void dispDefaultDev(int x, int y, unsigned char c); //在buffer中显示数据
-  int flushDispRegion(PDispRegion_S pDispRegion, PDispBuffer_S pDispBuffer); //把buffer中的数据刷到显示设备的内存中
-  PDispBuffer_S getDispBuffer(void); //获取buffer
+  //provide with model of disp_manager.c to display device
+  int putPixel(int x, int y, unsigned int dwColor);  //绘制单个像素点
+  void dispDevRegister(PDispDev_S pDispDev);         //注册某个底层显示设备到显示管理器
+  
+  //provide with model of disp_manager.c to disp_test.c/user
+  void dispSystemRegister(void);                     //注册所有底层显示设备
+  int selectDefaultDispDev(char* pName);             //选择一个显示设备
+int defaultDispDevInit(void);                      //初始化已经选择的显示设备
+  void dispDefaultDev(int x, int y, unsigned char c);//在buffer中显示数据
+int flushDispRegion(PDispRegion_S pDispRegion, PDispBuffer_S pDispBuffer); //把buffer中的数据刷到显示设备的内存中
+  PDispBuffer_S getDispBuffer(void);//获取buffer
   ```
-
-  显示管理器用`DispDev`结构体描述底层显示设备，用`DispBuffer`结构体描述显示`buffer`，用结构体`DispRegion`描述`buffer`刷新到硬件显示内存的哪个区域，只有当显示`buffer`刷新到硬件显存之后，数据才会真正的显示；底层显示设备使用显示管理器提供的`int putPixel(int x, int y, unsigned int dwColor)`函数构造自己的数据显示函数，从而在提供给显示管理器，底层显示设备使用`void registerDispDev(PDispDev_S pDispDev)`函数把自己的`DispDev`结构体注册进显示管理器，显示管理器通过链表的形式把所有显示设备连接起来，需要使用的时候就在链表中查询
-
+  
+  显示管理器用`DispDev`结构体描述底层显示设备，用`DispBuffer`结构体描述显示`buffer`，用结构体`DispRegion`描述`buffer`刷新到硬件显示内存的哪个区域，只有当显示`buffer`刷新到硬件显存之后，数据才会真正的显示；底层显示设备使用显示管理器提供的`int putPixel(int x, int y, unsigned int dwColor)`函数构造自己的数据显示函数，从而在提供给显示管理器，底层显示设备使用`dispDevRegister`函数把自己的`DispDev`结构体注册进显示管理器，显示管理器通过链表的形式把所有显示设备连接起来，需要使用的时候就在链表中查询
+  
   ```C++
   typedef struct DispBuffer
   {
@@ -57,26 +62,30 @@
 * 输入管理器提供给主线程的通用API：
 
   ```C++
-  void inputDevRegister(void);//注册底层硬件输入设备到输入管理器
-  int  initInputDevice(void); //初始化所有输入设备
-  int userGetInputEventData(PInputEvent_S pInputEvent); //获取输入数据
+  //provide with model of input_manager.c to input device
+  void inputDevRegister(PInputDevice_S ptInputDev);     //注册底层硬件输入设备到输入管理器
+  
+  //provide with model of input_manager.c to input_test.c/user
+void inputSystemRegister(void);                       //注册所有底层输入设备
+  int  inputDeviceInit(void);                           //初始化所有输入设备
+int userGetInputEventData(PInputEvent_S pInputEvent); //获取输入数据
   ```
-
+  
   输入管理器抽象出`InputDevice`结构体用来描述每个硬件输入设备
-
+  
   ```C++
   typedef struct InputDevice
   {
       char* name;             //设备名
   	int   (*inputDevInit)(void); //设备初始化函数
   	int   (*inputDevExit)(void); //设备卸载函数
-  	int   (*getInputEvent)(PInputEvent_S pInputEvent); //获取设备的输入数据
+	int   (*getInputEvent)(PInputEvent_S pInputEvent); //获取设备的输入数据
   	struct InputDevice* pNext; //指向注册进输入管理器的下一个设备InputDevice结构体
-  }InputDevice_S, * PInputDevice_S;
+}InputDevice_S, * PInputDevice_S;
   ```
-
+  
   其中`InputEvent`结构体用来描述**硬件设备输入的一次完整数据**
-
+  
   ```C++
   typedef struct InputEvent
   {
@@ -84,18 +93,18 @@
       int x;                 //触摸屏X坐标
   	int y;                 //触摸屏Y坐标
   	int pressure;          //压力
-  	char str[1024];        //网络输入的字符串
-  	struct timeval time;   //系统系统后的时间
+	char str[1024];        //网络输入的字符串
+  	struct timeval time;   //系统后的时间
   }InputEvent_S, * PInputEvent_S;
   ```
-
-  **底层硬件输入设备**通过输入管理器提供的函数`registerInputDev`把自己**注册进输入管理器**
+  
+  **底层硬件输入设备**通过输入管理器提供的函数`inputDevRegister`把自己**注册进输入管理器**
   
 * **touchscreen.c/h**：通过**tslib**库实现数据的读取，然后放进**InputEvent**，而**netinput.c/h**通过UDP协议获取数据，然后放进**InputEvent**结构体
 
 * 数据读取的过程：
 
-  1. **initInputDevice**函数会为**每个底层输入设备**创建一个**数据读取线程**，当有数据输入的时候，线程会把数据读取回来，然后放入环形buffer，然后通过**pthread_cond_signal**唤醒**userGetInputEventData**函数从环形**buf**读取数据
+  1. **inputDeviceInit**函数会为**每个底层输入设备**创建一个**数据读取线程**，当有数据输入的时候，线程会把数据读取回来，然后放入环形buffer，然后通过**pthread_cond_signal**唤醒**userGetInputEventData**函数从环形**buf**读取数据
   2. 当环形buf没有数据的时候，**userGetInputEventData**会阻塞在**pthread_cond_wait**函数处
 
 ### 字体管理器
@@ -214,7 +223,7 @@
 
   `cp lib/* -rfd /home/yhd_wsl2/100ask_imx6ull-sdk/ToolChain/gcc-linaro-6.2.1-2016.11-x86_64_arm-linux-gnueabihf/bin/../arm-linux-gnueabihf/libc/usr/lib/`
 
-* 包含：**font_manager.c/h、framebuffer.c/h**等模块
+* 包含：**font_manager.c/h、freetype.c/h**等模块
 
   1. **font_manager.c/h**：字体管理器
   2. **freetype.c/h**：底层字体处理引擎
@@ -228,6 +237,7 @@ typedef struct FontLib
 	int (*fontInit)(char * pFontFileName);
 	int (*setFontSize)(int fontSize);
 	int (*getFontBitMap)(unsigned int fontCode, PFontBitMap_S pFontBitMap);
+	int (*getStrBoxRegionCar)(char * pStr, PDispRegionCartesian_S pDispRegionCartesian);
 	struct FontLib *pNext;
 }FontLib_S, * PFontLib_S;
 ```
@@ -249,23 +259,27 @@ typedef struct FontBitMap
 **字体管理器**也起着呈上启下的作用，向用户提供简单字体处理函数：
 
 ```C++
-void fontsLibRegister(void);       //注册底层的字库处理工具，freetype，点阵字库等
-int selectAndInitFontLib(char * pFontLibName, char * pFontFileName); //选择并且初始化字库，打开字体文件
-int setFontSize(int fontSize);  //设置字体大小
-int getFontBitMap(unsigned int fontCode, PFontBitMap_S pFontBitMap); //获得字符的位图
+//provide with model of font_manager.c to font lib
+void fontlibRegister(PFontLib_S pFontLib);        //注册底层单个字库处理工具，freetype，点阵字库等                  
 
+//provide with model of font_manager.c to font_test.c/user
+void fontsLibSystemRegister(void);               //把支持的所有字库处理工具注册到管理器
+int selectAndInitFontLib(char * pFontLibName, char * pFontFileName);//选择并且初始化字库，打开字体文件
+int setFontSize(int fontSize);                  //设置字体大小
+int getFontBitMap(unsigned int fontCode, PFontBitMap_S pFontBitMap);  //获得字符的位图
+int getStrBoxRegionCar(char *pStr, PDispRegionCartesian_S pDispRegionCartesian); //获取字符串的外框
 ```
 
 向**底层字库管理工具**提供注册函数
 
 ```C++
-void registerFontLib(PFontLib_S pFontLib)
+void fontlibRegister(PFontLib_S pFontLib)
 ```
 
 同时在**显示管理器**中实现位图显示函数，把字符的位图信息写到**显示buffer**中
 
 ```C++
-void drawFontBitMap(PFontBitMap_S pFontBitMap, unsigned int dwColor)
+void drawFontBitMap(PFontBitMap_S pFontBitMap, unsigned int dwColor);
 ```
 
 最后通过显示管理器提供的函数`flushDispRegion`把数据刷到显存中
@@ -313,13 +327,17 @@ typedef struct UiButton
   页面管理器向底层页面模块，比如**mainpage.c/h**，提供注册函数**pageRegister**，底层页面便可以把实现的**PageAction**结构体注册到页面管理器中，页面管理器可以向用户提供简单页面处理接口：
 
   ```C++
-  PPageAction_S selectPage(char * pName); //选择需要使用的底层页面
-  void pageSystemRegister(void);//注册所有底层页面
+  //provide with model of page_manager.c to page_action
+  void pageRegister(PPageAction_S pPageAction);  //注册某一个底层页面
+  
+  //provide with model of page_manager.c to user/page_test.c
+  PPageAction_S selectPage(char * pName);   //选择需要使用的底层页面
+  void pageSystemRegister(void);            //注册所有底层页面
   ```
 
 ### 业务系统
 
-* 初始化显示系统、输入系统、字体系统、页面系统，调用主页面，在主页面中读取配置文件，根据配置文件生成按钮界面，然后等待事件缓冲去有数据便可以读取事件，根据事件找到对应的输入设备(按钮、网络输入)，然后执行相应的响应函数
+* 初始化显示系统、输入系统、字体系统、页面系统，调用主页面，在主页面中读取配置文件，根据配置文件生成按钮界面，然后等待事件缓冲区有数据便可以读取事件，根据事件找到对应的输入设备(按钮、网络输入)，然后执行相应的响应函数
 
 
 
@@ -363,5 +381,6 @@ typedef struct UiButton
   3. 调试信息只有超过**g_iDbgLevelLimit**这个级别，才能被输出
 
 * **底层调试模块**的具体实现原理：
+  
   1. **stdout.c**标准输出调试模块通过**printf**函数实现
   2. **netprint.c**底层网络调试模块基于UDP协议实现，该模块会初始化为一个UDP服务器，并且创建发送线程、接受线程、环形缓冲区。接受线程可以接受客户端的命令，实现设置打印级别，使能/失能打印模块。当上层进行数据打印的时候，**netprint.c**中的打印函数会把数据存入环形缓冲区，并且唤醒发送线程，发送线程从环形缓冲区取出数据然后便可以发送给客户端进行显示
